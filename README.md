@@ -40,7 +40,7 @@ SnapTeX 是一款极其轻量的 Windows 桌面小工具。它可以将屏幕截
 > **✨ 核心体验：只需截个图，完美的 LaTeX 代码就已经在你的剪贴板里了。**
 
 <p align="center">
-  <video src="./assets/main-ui.mp4" width="80%" autoplay loop muted controls></video>
+  <video src="https://github.com/chenyuwang2020/SnapTeX/raw/refs/heads/main/assets/main-ui.mp4" width="80%" autoplay loop muted controls></video>
 </p>
 
 ---
