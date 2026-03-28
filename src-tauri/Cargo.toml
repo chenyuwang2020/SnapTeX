@@ -1,0 +1,36 @@
+[package]
+name = "snaptex-v2"
+version = "2.0.0"
+edition = "2024"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+ort = { version = "2.0.0-rc.12", default-features = false, features = ["std", "ndarray", "download-binaries", "copy-dylibs", "tls-native", "api-24"] }
+tokenizers = { version = "0.21", default-features = false, features = ["fancy-regex"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+ndarray = "0.17"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+base64 = "0.22"
+arboard = "3"
+latex2mathml = "0.2.3"
+windows-sys = { version = "0.61.2", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_System_DataExchange",
+  "Win32_System_LibraryLoader",
+  "Win32_System_Threading",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "s"
+strip = true
+panic = "abort"

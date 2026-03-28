@@ -1,33 +1,23 @@
-# Python
+target/
+src-tauri/target/
+
+models/
+
 __pycache__/
 *.py[cod]
-*.egg-info/
-*.egg
-dist/
-
-# Virtual environments
+*.pycod
 .venv/
 venv/
+*.egg-info/
 
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
 Thumbs.db
 Desktop.ini
 .DS_Store
 
-# PyInstaller build artifacts
-build/dist/
-build/build/
-build/output/
-build/_entry.py
-
-# Inno Setup
-*.spec.bak
-
-# Logs
 *.log
+.pytest_cache/

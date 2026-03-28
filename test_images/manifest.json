@@ -1,0 +1,52 @@
+[
+  {
+    "file": "formula_01_fraction.png",
+    "latex": "\\frac{a}{b} = c",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_02_sigma.png",
+    "latex": "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_03_integral.png",
+    "latex": "\\int_{0}^{1} x^2 \\, dx = \\frac{1}{3}",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_04_euler.png",
+    "latex": "e^{i\\pi} + 1 = 0",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_05_pythagorean.png",
+    "latex": "\\sqrt{a^2 + b^2} = c",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_06_limit.png",
+    "latex": "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_07_binomial.png",
+    "latex": "\\binom{n}{k} = \\frac{n!}{k!(n-k)!}",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_08_greek.png",
+    "latex": "\\alpha^2 + \\beta^2 = \\gamma^2",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_09_matrix.png",
+    "latex": "A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}",
+    "source": "https://latex.codecogs.com/"
+  },
+  {
+    "file": "formula_10_parentheses.png",
+    "latex": "f(x) = \\left( x + 1 \\right)^2",
+    "source": "https://latex.codecogs.com/"
+  }
+]

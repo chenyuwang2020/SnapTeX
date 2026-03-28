@@ -1,0 +1,43 @@
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+[1m[92m   Compiling[0m snaptex-v2 v2.0.0 (C:\Users\chenyu\ws_chenyu\Code\TOY\pix2text\SnapTeX\src-tauri)
+[1m[96m    Building[0m [=======================> ] 481/483: snaptex…[1m[96m    Building[0m [=======================> ] 482/483: snaptex…                                                            [1m[92m    Finished[0m `dev` profile [unoptimized + debuginfo] target(s) in 5.23s
+[1m[92m     Running[0m `target\debug\snaptex-v2.exe`
+setup: main window ready
+clipboard monitor started
+model loader: started
+hotkey thread started: tid=20464
+hotkey registered: Alt+Q
+clipboard poll: seq=2130 has_image=false
+hotkey registered: Alt+Q
+clipboard poll: seq=2130 has_image=false
+model loader: ready id=mfr-1.5-int8 dir=C:\Users\chenyu\ws_chenyu\Code\TOY\pix2text\SnapTeX\models\mfr-1.5-int8
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+clipboard poll: seq=2130 has_image=false
+[1m[91merror[0m: process didn't exit successfully: `target\debug\snaptex-v2.exe` (exit code: 0xffffffff)

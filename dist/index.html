@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SnapTeX</title>
+    <link rel="stylesheet" href="./assets/katex/katex.min.css" />
+    <link rel="stylesheet" href="./assets/mathlive/mathlive-fonts.css" />
+    <link rel="stylesheet" href="./assets/mathlive/mathlive-static.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: radial-gradient(circle at top, #f8fbff 0%, #eef3f8 42%, #dde5ee 100%);
+        --panel: rgba(255, 255, 255, 0.9);
+        --panel-strong: rgba(255, 255, 255, 0.96);
+        --border: rgba(25, 42, 62, 0.12);
+        --text: #17324a;
+        --muted: #58718a;
+        --accent: #0a84ff;
+        --ok: #0e9f6e;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+        background: #f8fbff;
+        color: var(--text);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .app {
+        width: 100%;
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 18px;
+        padding: 20px 24px;
+        background: transparent;
+        overflow-y: auto;
+      }
+
+      .toolbar,
+      .status-row,
+      .footer,
+      .result-head,
+      .export-head,
+      .editor-head,
+      .editor-actions,
+      .candidates-head,
+      .batch-strip-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .title {
+        display: grid;
+        gap: 4px;
+      }
+
+      .title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .app-logo {
+        width: 40px;
+        height: 40px;
+        display: block;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: none;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 30px;
+        letter-spacing: 0.02em;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .actions,
+      .footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      button,
+      select {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 15px;
+      }
+
+      button {
+        background: linear-gradient(135deg, #0a84ff, #42a5ff);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(10, 132, 255, 0.22);
+      }
+
+      button.secondary {
+        background: rgba(23, 50, 74, 0.08);
+        color: var(--text);
+        box-shadow: none;
+      }
+
+      button.danger {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger);
+        box-shadow: none;
+      }
+
+      button.active {
+        background: linear-gradient(135deg, #ef4444, #f87171);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+        color: white;
+      }
+
+      button:disabled,
+      select:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      select {
+        min-width: 150px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(23, 50, 74, 0.12);
+        outline: none;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 40px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: var(--panel-strong);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid rgba(10, 132, 255, 0.16);
+        border-top-color: var(--accent);
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .copy-toast {
+        color: var(--ok);
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: 0.18s ease;
+      }
+
+      .copy-toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .card {
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: var(--panel-strong);
+        box-shadow: 0 16px 36px rgba(23, 50, 74, 0.08);
+      }
+
+      .preview-card {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        overflow: hidden;
+      }
+
+      .preview {
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        min-height: 360px;
+        padding: 20px;
+        background:
+          linear-gradient(45deg, rgba(10, 132, 255, 0.05) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(10, 132, 255, 0.05) 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, rgba(10, 132, 255, 0.05) 75%),
+          linear-gradient(-45deg, transparent 75%, rgba(10, 132, 255, 0.05) 75%);
+        background-size: 24px 24px;
+        background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+      }
+
+      .preview-meta {
+        padding: 14px 18px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .placeholder {
+        color: var(--muted);
+        font-size: 15px;
+        text-align: center;
+        line-height: 1.7;
+      }
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        display: none;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 12px 28px rgba(23, 50, 74, 0.16);
+      }
+
+      .result-card {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .result-title,
+      .candidates-label,
+      .confidence-label,
+      .editor-label,
+      .export-label {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .render-panel {
+        min-height: 180px;
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid rgba(10, 132, 255, 0.12);
+        background: linear-gradient(180deg, rgba(10, 132, 255, 0.05), rgba(255, 255, 255, 0.95));
+        overflow: auto;
+      }
+
+      .render-empty,
+      .export-note {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .candidates-panel,
+      .confidence-bar,
+      .editor-panel,
+      .export-area {
+        display: grid;
+        gap: 12px;
+      }
+
+      .candidates-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .candidate-card {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(23, 50, 74, 0.12);
+        background: rgba(255, 255, 255, 0.96);
+        cursor: pointer;
+        transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      }
+
+      .candidate-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(10, 132, 255, 0.35);
+      }
+
+      .candidate-card.selected {
+        border-color: rgba(10, 132, 255, 0.88);
+        box-shadow: 0 12px 26px rgba(10, 132, 255, 0.14);
+      }
+
+      .candidate-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .candidate-index {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .candidate-score {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .candidate-render {
+        min-height: 54px;
+        display: grid;
+        place-items: center;
+        padding: 8px;
+        border-radius: 12px;
+        background: rgba(10, 132, 255, 0.04);
+        overflow: hidden;
+      }
+
+      .candidate-warning {
+        font-size: 12px;
+        color: var(--warn);
+      }
+
+      .confidence-tokens {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+
+      .confidence-token {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-family: "Cascadia Code", "Consolas", monospace;
+        border: 1px solid rgba(23, 50, 74, 0.08);
+      }
+
+      math-field {
+        width: 100%;
+        min-height: 126px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(23, 50, 74, 0.14);
+        background: rgba(255, 255, 255, 0.99);
+        font-size: 28px;
+        color: var(--text);
+      }
+
+      .editor-latex,
+      textarea {
+        width: 100%;
+        min-height: 110px;
+        resize: vertical;
+        border-radius: 16px;
+        border: 1px solid rgba(23, 50, 74, 0.14);
+        padding: 14px 16px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.98);
+        font-family: "Cascadia Code", "Consolas", monospace;
+      }
+
+      textarea[readonly] {
+        background: rgba(244, 248, 252, 0.98);
+      }
+
+      .batch-strip {
+        display: grid;
+        gap: 12px;
+        padding: 14px 0;
+      }
+
+      .batch-strip-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .batch-strip-list {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+
+      .batch-item {
+        display: grid;
+        gap: 8px;
+        min-width: 200px;
+        max-width: 240px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--panel-strong);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: border-color 0.16s ease;
+      }
+
+      .batch-item:hover {
+        border-color: rgba(10, 132, 255, 0.35);
+      }
+
+      .batch-item.active {
+        border-color: rgba(10, 132, 255, 0.88);
+        box-shadow: 0 8px 20px rgba(10, 132, 255, 0.12);
+      }
+
+      .batch-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .batch-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: rgba(10, 132, 255, 0.12);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .batch-thumb {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: contain;
+        display: block;
+        border-radius: 12px;
+        background: rgba(10, 132, 255, 0.04);
+        box-shadow: none;
+      }
+
+      .batch-render {
+        min-height: 68px;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(10, 132, 255, 0.04);
+        overflow: auto;
+      }
+
+      .batch-latex {
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--muted);
+        cursor: pointer;
+        word-break: break-word;
+      }
+
+      .footer {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      @media (max-width: 960px) {
+        .app {
+          padding: 18px;
+        }
+
+        .content {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar,
+        .status-row,
+        .footer,
+        .result-head,
+        .export-head,
+        .editor-head,
+        .editor-actions,
+        .candidates-head,
+        .batch-strip-head {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .actions,
+        .footer-actions {
+          width: 100%;
+        }
+
+        button,
+        select {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="toolbar">
+        <div class="title">
+          <div class="title-row">
+            <img src="./assets/logo.png" alt="SnapTeX" class="app-logo" />
+            <h1>SnapTeX</h1>
+          </div>
+          <div class="hint">截图、Alt+Q 热键或剪贴板图片都会自动识别；支持候选审查、MathLive 编辑和题集模式。</div>
+        </div>
+        <div class="actions">
+          <button id="capture-button" type="button">截图</button>
+          <button id="batch-button" class="secondary" type="button">题集模式</button>
+          <button id="copy-button" class="secondary" type="button">复制当前格式</button>
+        </div>
+      </section>
+
+      <section class="status-row">
+        <div class="status-pill">
+          <span class="spinner" id="status-spinner"></span>
+          <span id="status">模型加载中...</span>
+        </div>
+        <div class="copy-toast" id="copy-toast">已复制</div>
+      </section>
+
+      <section class="content" id="single-content">
+        <article class="card preview-card">
+          <div class="preview">
+            <div class="placeholder" id="placeholder">点击“截图”开始框选，或直接复制一张图片到剪贴板。</div>
+            <img id="preview-image" alt="截图预览" />
+          </div>
+          <div class="preview-meta" id="meta">等待输入</div>
+        </article>
+
+        <article class="card result-card">
+          <div class="result-head">
+            <div class="result-title">识别结果</div>
+            <div class="hint" id="result-meta">尚未开始识别</div>
+          </div>
+
+          <div class="render-panel" id="katex-panel">
+            <div class="render-empty" id="render-empty">模型就绪后，截图会自动识别并在这里渲染。</div>
+          </div>
+
+          <section class="candidates-panel hidden" id="candidates-panel">
+            <div class="candidates-head">
+              <div class="candidates-label">识别候选</div>
+              <div class="hint" id="candidates-meta"></div>
+            </div>
+            <div class="candidates-list" id="candidates-list"></div>
+          </section>
+
+          <section class="confidence-bar hidden" id="confidence-bar">
+            <div class="confidence-label">Token 置信度</div>
+            <div class="confidence-tokens" id="confidence-tokens"></div>
+          </section>
+
+          <section class="editor-panel">
+            <div class="editor-head">
+              <div class="editor-label">MathLive 可视化编辑器</div>
+              <div class="hint" id="editor-meta">识别完成后会自动写入编辑器</div>
+            </div>
+            <math-field id="math-editor" class="math-editor"></math-field>
+            <div class="editor-actions">
+              <button id="keyboard-button" class="secondary" type="button">显示数学键盘</button>
+              <button id="copy-editor-button" class="secondary" type="button">从编辑器复制 LaTeX</button>
+            </div>
+            <div class="hint" id="batch-edit-meta"></div>
+            <div class="hint">手动编辑后，导出和复制都会使用这里的最新内容。</div>
+            <div class="hint">LaTeX 源码（可直接编辑）</div>
+            <textarea id="editor-latex" class="editor-latex" placeholder="直接输入 LaTeX 源码，MathLive 会同步更新"></textarea>
+          </section>
+
+          <div class="export-area">
+            <div class="export-head">
+              <div class="export-label" id="export-label">导出格式</div>
+              <select id="format-select">
+                <option value="latex">LaTeX</option>
+                <option value="mathml">MathML</option>
+                <option value="typst">Typst</option>
+                <option value="markdown">Markdown</option>
+              </select>
+            </div>
+            <textarea id="export-text" readonly placeholder="导出内容会显示在这里。"></textarea>
+            <div class="export-note" id="export-note">自动复制和手动复制都会使用当前下拉格式导出。</div>
+          </div>
+        </article>
+      </section>
+
+      <section class="batch-strip hidden" id="batch-strip">
+        <div class="batch-strip-head">
+          <div class="batch-strip-title">题集 · <span id="batch-count">0</span> 道题</div>
+          <div class="actions">
+            <button id="batch-export-button" class="secondary" type="button">批量导出</button>
+          </div>
+        </div>
+        <div class="batch-strip-list" id="batch-list"></div>
+      </section>
+
+      <footer class="footer">
+        <div id="footer-left">KaTeX 只读预览</div>
+        <div class="footer-actions">
+          <div id="footer-right">等待模型加载</div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="./assets/katex/katex.min.js"></script>
+    <script src="./assets/mathlive/mathlive.min.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>
